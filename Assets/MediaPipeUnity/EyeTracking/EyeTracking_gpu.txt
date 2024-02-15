@@ -30,6 +30,7 @@ node{
 	node_options: {
 		[type.googleapis.com/mediapipe.ImageTransformationCalculatorOptions] {
 			flip_vertically: true
+			flip_horizontally: true
 		}
 	}
 }

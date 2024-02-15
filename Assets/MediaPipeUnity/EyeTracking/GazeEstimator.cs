@@ -7,51 +7,250 @@ using Mediapipe.Unity;
 using Mediapipe.Unity.CoordinateSystem;
 using UnityEngine.UI;
 using System.Linq;
+using OpenCvSharp;
+using UnityEngine.UIElements;
+using Unity.VisualScripting;
+using System;
 
 public class GazeEstimator : MonoBehaviour
 {
     [SerializeField] private RawImage screen;
+    [SerializeField] private GameObject cube;
+    [SerializeField] private GameObject canvas;
+    [SerializeField] private float width;
+    [SerializeField] private float height;
+
+    private Vector3 vec;
+    
+    private Vector3 TemporarycalibratedDirection;
 
     private UnityEngine.Rect screenRect;
     private NormalizedLandmarkList faceNirislandmarks;
+    private GameObject[] spheresForLandmarks = new GameObject[468];
 
+    private int[] LeftEyeIndices = new int[]{362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398};
+    private int[] RightEyeIndices = new int[] { 33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246 };
+
+    private int[] LeftIrisIndices = new int[] { 474, 475, 476, 477 };
+    private int[] RightIrisIndices = new int[] { 469, 470, 471, 472 };
     // Start is called before the first frame update
     void Start()
     {
         screenRect = screen.GetComponent<RectTransform>().rect;
+        for (int i = 0; i < 468; i++)
+        {
+            spheresForLandmarks[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            spheresForLandmarks[i].transform.SetParent(canvas.transform);
+            spheresForLandmarks[i].transform.localScale = new Vector3(5, 5, 5);
+        }
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            TemporarycalibratedDirection = vec;
+        }
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            TemporarycalibratedDirection = Vector3.zero;
+        }
+    }
+
+    public void EyeTracker(NormalizedLandmarkList landmarks)
+    {
+        // 눈 landmark 가져오기
+        Vector2[] leyepoints = new Vector2[LeftEyeIndices.Length];
+        for(int i = 0; i < LeftEyeIndices.Length; i++)
+        {
+            leyepoints[i] = new Vector2(landmarks.Landmark[LeftEyeIndices[i]].X*width, 
+                                        height-landmarks.Landmark[LeftEyeIndices[i]].Y*height);
+        }
+        Vector2[] reyepoints = new Vector2[RightEyeIndices.Length];
+        for (int i = 0; i < RightEyeIndices.Length; i++)
+        {
+            reyepoints[i] = new Vector2(landmarks.Landmark[RightEyeIndices[i]].X * width,
+                                        height - landmarks.Landmark[RightEyeIndices[i]].Y * height);
+        }
+        Vector2[] leyeRect = new Vector2[2];
+        Vector2[] reyeRect = new Vector2[2];
+        
+        // 눈 영역 구하기
+        leyeRect = GetEyeRectPoint(leyepoints);
+        reyeRect = GetEyeRectPoint(reyepoints);
+
+        // 눈 영역의 중점 구하기
+        Vector2 leyeRectCenter = GetCenterPoint(leyeRect);
+        Vector2 reyeRectCenter = GetCenterPoint(reyeRect);
+
+        // 눈 영역 가로세로 사이즈 구하기
+        Vector2 leyeRectSize = new Vector2(leyeRect[1].x - leyeRect[0].x, leyeRect[0].y - leyeRect[1].y);
+        Vector2 reyeRectSize = new Vector2(reyeRect[1].x - reyeRect[0].x, reyeRect[0].y - reyeRect[1].y);
+
+
+        // 눈동자 landmark 가져오기
+        Vector2[] LIrisPoints = new Vector2[4];
+        Vector2[] RIrisPoints = new Vector2[4];
+        for (int i = 0;i<4; i++)
+        {
+            LIrisPoints[i] = new Vector2(landmarks.Landmark[LeftIrisIndices[i]].X*width,
+                                         height - landmarks.Landmark[LeftIrisIndices[i]].Y*height);
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            RIrisPoints[i] = new Vector2(landmarks.Landmark[RightIrisIndices[i]].X * width,
+                                         height - landmarks.Landmark[RightIrisIndices[i]].Y * height);
+        }
+
+        // 각 눈동자의 중점
+        Vector2 LIrisCenter = GetCenterPoint(LIrisPoints);
+        Vector2 RIrisCenter = GetCenterPoint(RIrisPoints);
+
+        // 눈동자 위치와 눈 중점간 차이 비교로 눈 이동 확인
+        Vector2 LeyePos = LIrisCenter - leyeRectCenter;
+        Vector2 ReyePos = RIrisCenter - reyeRectCenter;
+
+        // 눈 이동거리 노멀라이즈
+        LeyePos = new Vector2(LeyePos.x / (leyeRectSize.x/2), LeyePos.y / (leyeRectSize.y/2));
+        ReyePos = new Vector2(ReyePos.x / (reyeRectSize.x/2), ReyePos.y / (reyeRectSize.y/2));
+
+
+        Debug.Log(LeyePos + "\n" + ReyePos);
+    }
+
+    private Vector2 GetCenterPoint(Vector2[] points)
+    {
+        Vector2 center = new Vector2(0,0);
+
+        foreach (Vector2 point in points)
+        {
+            center = new Vector2(center.x + point.x, center.y + point.y);
+        }
+        center = center/points.Length;
+
+        return center;
+    }
+
+    private Vector2[] GetEyeRectPoint(Vector2[] points)
+    {
+
+        //[(left,top), (right,bottom)]
+        Vector2[] rect = new Vector2[] { points[0], points[0] };
+
+        for(int i=0;i< points.Length; i++)
+        {
+            if (rect[0].x > points[i].x)
+                rect[0].x = points[i].x;
+            if (rect[1].x < points[i].x)
+                rect[1].x = points[i].x;
+
+            if (rect[0].y < points[i].y)
+                rect[0].y = points[i].y;
+            if (rect[1].y > points[i].y)
+                rect[1].y = points[i].y;
+        }
+
+        return rect;
+    }
+
+    public void HeadPoseTracker(NormalizedLandmarkList landmarks)
+    {
+        if(landmarks == null) { Debug.Log("Empty!"); }
+
+        Point3f[] objectPoints = new Point3f[6];
+
+
+        // Head Pose 추적 대표 점 Landmark (3D 월드 좌표계)
+        //NoseTop
+        objectPoints[0] = new Point3f(0, 0, 0);
+        //LeftEye
+        objectPoints[1] = new Point3f(-225, 170, -135);
+        //RightEye
+        objectPoints[2] = new Point3f(255, 170, -135);
+        //MouthLeft
+        objectPoints[3] = new Point3f(-150, -150, -125);
+        //MouthRight
+        objectPoints[4] = new Point3f(150, -150, -125);
+        //Chin
+        objectPoints[5] = new Point3f(0, -330, -65);
+
+
+
+        Point2f[] imagePoints = new Point2f[6];
+
+        // Head Pose 추적 대표 점 Landmark (2D 이미지 좌표계)
+        //NoseTop
+        imagePoints[0] = (new Point2f(landmarks.Landmark[1].X * width, height - landmarks.Landmark[1].Y * height));
+        //LeftEye
+        imagePoints[1] = (new Point2f(landmarks.Landmark[33].X * width, height - landmarks.Landmark[33].Y * height));
+        //RightEye
+        imagePoints[2] = (new Point2f(landmarks.Landmark[263].X * width, height - landmarks.Landmark[263].Y * height));
+        //MouthLeft
+        imagePoints[3] = (new Point2f(landmarks.Landmark[61].X * width, height - landmarks.Landmark[61].Y * height));
+        //MouthRight
+        imagePoints[4] = (new Point2f(landmarks.Landmark[291].X * width, height - landmarks.Landmark[291].Y * height));
+        //Chin
+        imagePoints[5] = (new Point2f(landmarks.Landmark[199].X * width, height - landmarks.Landmark[199].Y * height));
+
+        // 3D 좌표 행렬로 변환
+        var object_points = new MatOfPoint3f(1, 6, objectPoints);
+        // 2D 좌표 행렬로 변환
+        var image_points = new MatOfPoint2f(1, 6, imagePoints);
+
+        // 카메라 파라미터 행렬
+        var camera_matrix = new Mat(3, 3, MatType.CV_32F, new float[] {   640, 0,   height / 2, 
+                                                                            0,   640, width  / 2, 
+                                                                            0,   0,   1          });
+
+        // 왜곡보정 행렬
+        var dist_coeffs = new Mat(1, 4, MatType.CV_32F, new float[] { 0, 0, 0, 0 });
+        Mat rvec = new Mat(1, 3, MatType.CV_32F);
+        Mat tvec =new Mat(1,3, MatType.CV_32F);
+
+        // 3D 좌표계와 2D 좌표계, 카메라 파라미터, 왜곡 정보를 통해 카메라의 회전, 이동을 계산하는 함수
+        Cv2.SolvePnP(object_points, image_points, camera_matrix, dist_coeffs, rvec, tvec);
+
+        Debug.Log(rvec.Dump());
+
+        Mat rotMat = new Mat();
+
+        // SolvePnP에서 나온 Rodrigues 표현식 rvec를 3x3 행렬로 변환
+        Cv2.Rodrigues(rvec, rotMat);
+
+        Mat mtxR = new Mat();
+        Mat mtxQ = new Mat();
+
+
+        // 3x3 행렬 정보를 변환하여 x,y,z 축에 대한 회전각도 출력
+        Vec3d rotVec = Cv2.RQDecomp3x3(rotMat, mtxR, mtxQ);
+
+
+        // OpenCV와 Unity 상의 좌표계 방향이 다르므로 부호를 바꾸어서 유니티 내부 Vector3 형식으로 저장
+        Vector3 rotVecForUnity = new Vector3(-(float)rotVec.Item0, -(float)rotVec.Item1, (float)rotVec.Item2);
+
+
+        // X축 이 상하, Y축이 좌우 패러미터
+        cube.transform.localRotation = Quaternion.Euler((rotVecForUnity.x - TemporarycalibratedDirection.x), 
+                                                        (rotVecForUnity.y - TemporarycalibratedDirection.y), 
+                                                         rotVecForUnity.z - TemporarycalibratedDirection.z);
+
+
+        Debug.Log(rotVecForUnity);
+        vec = rotVecForUnity;
+
         
     }
 
-    public void HeadPoseLogger(NormalizedLandmarkList landmarks)
+
+    //landmark의 정확한 위치 : x * width, -y*height, z * (깊이)
+    public void FollowSphereToLandmarks(NormalizedLandmarkList landmarks)
     {
-        Vector2[] face_2d = new Vector2[6];
-        Vector3[] face_3d = new Vector3[6];
-
-        Vector3 nosetop = screenRect.GetPoint(landmarks.Landmark[1]);
-        Vector3 lefteye = screenRect.GetPoint(landmarks.Landmark[33]);
-        Vector3 righteye = screenRect.GetPoint(landmarks.Landmark[263]);
-        Vector3 mouthleft = screenRect.GetPoint(landmarks.Landmark[61]);
-        Vector3 mouthright = screenRect.GetPoint(landmarks.Landmark[291]);
-        Vector3 chin = screenRect.GetPoint(landmarks.Landmark[199]);
-
-        face_3d.Append(nosetop);
-        face_2d.Append(new Vector2(nosetop.x, nosetop.y));
-        face_3d.Append(lefteye);
-        face_2d.Append(new Vector2(lefteye.x, lefteye.y));
-        face_3d.Append(righteye);
-        face_2d.Append(new Vector2(righteye.x, righteye.y));
-        face_3d.Append(mouthleft);
-        face_2d.Append(new Vector2(mouthleft.x, mouthleft.y));
-        face_3d.Append(mouthright);
-        face_2d.Append(new Vector2(mouthright.x, mouthright.y));
-        face_3d.Append(chin);
-        face_2d.Append(new Vector2(chin.x, chin.y));
-
-
+        for(int i = 0; i < 468; i++)
+        {
+            spheresForLandmarks[i].transform.localPosition = new Vector3(landmarks.Landmark[i].X* width - width/2, height/2-landmarks.Landmark[i].Y * height, landmarks.Landmark[i].Z * width - 50);
+        }
     }
+
 }

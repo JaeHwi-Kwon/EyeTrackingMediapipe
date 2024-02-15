@@ -6,6 +6,7 @@ using Mediapipe.Unity.CoordinateSystem;
 using Stopwatch = System.Diagnostics.Stopwatch;
 using TMPro;
 using Unity.VisualScripting;
+using UnityEngine.UIElements;
 
 namespace Mediapipe.Unity.EyeTrackingSystem
 {
@@ -105,8 +106,17 @@ namespace Mediapipe.Unity.EyeTrackingSystem
                     var FaceandIrisLandmarks = FaceandIrisLandmarksPacket.Get(NormalizedLandmarkList.Parser);
                     if(FaceandIrisLandmarks != null)
                     {
-                        var topOfHead = FaceandIrisLandmarks.Landmark[10];
-                        Debug.Log($"Unity Local Coordinates: {screenRect.GetPoint(topOfHead)}, Image Coordinates: {topOfHead}");
+                        //var topOfHead = FaceandIrisLandmarks.Landmark[10];
+                        //Debug.Log($"Unity Local Coordinates: {screenRect.GetPoint(topOfHead)}, Image Coordinates: {topOfHead}");
+
+                        // 안면 기울기 추적 함수
+                        GetComponent<GazeEstimator>().HeadPoseTracker(FaceandIrisLandmarks);
+
+                        //// 랜드마크 점을 구체가 따라다니게 함
+                        //GetComponent<GazeEstimator>().FollowSphereToLandmarks(FaceandIrisLandmarks);
+
+                        // 눈동자 추적 함수
+                        GetComponent<GazeEstimator>().EyeTracker(FaceandIrisLandmarks);
                     }
                 }
 

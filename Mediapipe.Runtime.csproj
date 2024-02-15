@@ -334,9 +334,9 @@
     <Compile Include="Packages\com.github.homuler.mediapipe\Runtime\Scripts\Protobuf\Calculators\Audio\StabilizedLogCalculator.cs" />
     <Compile Include="Packages\com.github.homuler.mediapipe\Runtime\Scripts\Protobuf\Tasks\Core\Proto\BaseOptions.cs" />
     <Compile Include="Packages\com.github.homuler.mediapipe\Runtime\Scripts\Unity\Annotation\RectangleAnnotation.cs" />
-    <Compile Include="Packages\com.github.homuler.mediapipe\Runtime\Scripts\Unity\Annotation\NormalizedLandmarkListAnnotationController.cs" />
     <Compile Include="Packages\com.github.homuler.mediapipe\Runtime\Scripts\Protobuf\Calculators\Util\PacketFrequencyCalculator.cs" />
     <Compile Include="Packages\com.github.homuler.mediapipe\Runtime\Scripts\Protobuf\Util\RenderData.cs" />
+    <Compile Include="Packages\com.github.homuler.mediapipe\Runtime\Scripts\Unity\Annotation\NormalizedLandmarkListAnnotationController.cs" />
     <Compile Include="Packages\com.github.homuler.mediapipe\Runtime\Scripts\PInvoke\NativeMethods\Framework\Packet_Unsafe.cs" />
     <Compile Include="Packages\com.github.homuler.mediapipe\Runtime\Scripts\Framework\Packet.cs" />
     <Compile Include="Packages\com.github.homuler.mediapipe\Runtime\Scripts\PInvoke\UnsafeNativeMethods.cs" />
