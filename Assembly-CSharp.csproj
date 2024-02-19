@@ -67,6 +67,7 @@
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\features2d\BOWTrainer.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\Enum\KMeansFlags.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\MatProxy.cs" />
+    <Compile Include="Assets\Scenes\TensorflowSample\Test.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\Enum\ReduceTypes.cs" />
     <Compile Include="Assets\OpenCV+Unity\Demo\Document_Scanner\Scripts\DocumentScannerScript.cs" />
     <Compile Include="Assets\MediaPipeUnity\Samples\Scenes\Hair Segmentation\HairSegmentationGraph.cs" />
@@ -544,6 +545,7 @@
   <ItemGroup>
     <None Include="Assets\OpenCV+Unity\Plugins\Windows\x86\OpenCvSharpExtern.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Face Detection\face_detection_opengles.txt" />
+    <None Include="Assets\Tensorflow.Net\MethodBoundaryAspect.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Iris Tracking\iris_tracking_gpu.txt" />
     <None Include="Assets\MediaPipeUnity\Tutorial\Official Solution\face_mesh_desktop_live_new.txt" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Face Detection\face_detection_cpu.txt" />
@@ -557,13 +559,18 @@
     <None Include="Assets\MediaPipeUnity\Tutorial\Official Solution\face_mesh_desktop_live.txt" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Object Detection\object_detection_cpu.txt" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Iris Tracking\iris_tracking_opengles.txt" />
+    <None Include="Assets\Tensorflow.Net\Protobuf.Text.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\MediaPipe Video\official_hand_tracking_demo_opengles.txt" />
+    <None Include="Assets\Tensorflow.Net\Google.Protobuf.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Selfie Segmentation\selfie_segmentation_gpu.txt" />
     <None Include="Assets\OpenCV+Unity\smcs.rsp" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Hand Tracking\hand_tracking_opengles.txt" />
     <None Include="Assets\OpenCV+Unity\gmcs.rsp" />
     <None Include="Assets\MediaPipeUnity\EyeTracking\EyeTracking_gpu.txt" />
+    <None Include="Assets\Tensorflow.Net\System.Numerics.Vectors.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Hair Segmentation\hair_segmentation_gpu.txt" />
+    <None Include="Assets\Tensorflow.Net\Razorvine.Pickle.dll" />
+    <None Include="Assets\Tensorflow.Net\Tensorflow.Binding.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Pose Tracking\pose_tracking_gpu.txt" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Object Detection\object_detection_gpu.txt" />
     <None Include="Assets\OpenCV+Unity\Documentation\OpenCV+Unity_Notes.txt" />
@@ -572,18 +579,24 @@
     <None Include="Assets\OpenCV+Unity\Demo\Face_Detector\haarcascade_eye_tree_eyeglasses.xml" />
     <None Include="Assets\OpenCV+Unity\Plugins\Windows\x86_64\OpenCvSharpExtern.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Face Mesh\face_mesh_opengles.txt" />
+    <None Include="Assets\Tensorflow.Net\System.Memory.dll" />
     <None Include="Assets\MediaPipeUnity\Tutorial\Official Solution\face_mesh_desktop_live_gpu.txt" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Holistic\holistic_cpu.txt" />
+    <None Include="Assets\Tensorflow.Net\System.Buffers.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\MediaPipe Video\official_hand_tracking_demo_gpu.txt" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Hand Tracking\hand_tracking_cpu.txt" />
     <None Include="Assets\OpenCV+Unity\Demo\Face_Recognizer\face-recognizer.xml" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\MediaPipe Video\official_hand_tracking_demo_cpu.txt" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Object Detection\object_detection_opengles.txt" />
     <None Include="Assets\OpenCV+Unity\Demo\Face_Detector\haarcascade_frontalface_default.xml" />
+    <None Include="Assets\Tensorflow.Net\Serilog.Sinks.Console.dll" />
+    <None Include="Assets\Tensorflow.Net\Serilog.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Selfie Segmentation\selfie_segmentation_opengles.txt" />
+    <None Include="Assets\Tensorflow.Net\System.Runtime.CompilerServices.Unsafe.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Holistic\holistic_opengles.txt" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Iris Tracking\iris_tracking_cpu.txt" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Holistic\holistic_gpu.txt" />
+    <None Include="Assets\Tensorflow.Net\OneOf.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Face Detection\face_detection_gpu.txt" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Face Mesh\face_mesh_cpu.txt" />
     <None Include="Assets\OpenCV+Unity\mcs.rsp" />
@@ -921,20 +934,48 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.16f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="MethodBoundaryAspect">
+      <HintPath>Assets\Tensorflow.Net\MethodBoundaryAspect.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.2.4\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Protobuf.Text">
+      <HintPath>Assets\Tensorflow.Net\Protobuf.Text.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Google.Protobuf">
+      <HintPath>Assets\Tensorflow.Net\Google.Protobuf.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
       <HintPath>Packages\com.github.homuler.mediapipe\Runtime\Plugins\Protobuf\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Google.Protobuf">
-      <HintPath>Packages\com.github.homuler.mediapipe\Runtime\Plugins\Protobuf\Google.Protobuf.dll</HintPath>
+    <Reference Include="Razorvine.Pickle">
+      <HintPath>Assets\Tensorflow.Net\Razorvine.Pickle.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Tensorflow.Binding">
+      <HintPath>Assets\Tensorflow.Net\Tensorflow.Binding.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
       <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.1\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Serilog.Sinks.Console">
+      <HintPath>Assets\Tensorflow.Net\Serilog.Sinks.Console.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Serilog">
+      <HintPath>Assets\Tensorflow.Net\Serilog.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OneOf">
+      <HintPath>Assets\Tensorflow.Net\OneOf.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

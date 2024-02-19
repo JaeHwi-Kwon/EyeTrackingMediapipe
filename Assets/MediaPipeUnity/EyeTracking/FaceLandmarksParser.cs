@@ -17,11 +17,14 @@ namespace Mediapipe.Unity.EyeTrackingSystem
         [SerializeField] private int _width;
         [SerializeField] private int _height;
         [SerializeField] private int _fps;
+        [SerializeField] private GameObject CircleForCalibration;
 
         private CalculatorGraph _graph;
         private OutputStream<ImageFrame> _outputVideoStream;
         private OutputStream<NormalizedLandmarkList> _FaceandIrisLandmarksStream;
         private ResourceManager _resourceManager;
+
+        public NormalizedLandmarkList FaceAndIrisLandmarks;
 
         private WebCamTexture _webcamTexture;
 
@@ -29,6 +32,8 @@ namespace Mediapipe.Unity.EyeTrackingSystem
         private Color32[] _inputPixelData;
         private Texture2D _outputTexture;
         private Color32[] _outputPixelData;
+
+        private bool firstCalled= true;
 
         private IEnumerator Start()
         {
@@ -103,20 +108,26 @@ namespace Mediapipe.Unity.EyeTrackingSystem
                 var FaceandIrisLandmarksPacket = result2.packet;
                 if(FaceandIrisLandmarksPacket != null)
                 {
-                    var FaceandIrisLandmarks = FaceandIrisLandmarksPacket.Get(NormalizedLandmarkList.Parser);
-                    if(FaceandIrisLandmarks != null)
+                    FaceAndIrisLandmarks = FaceandIrisLandmarksPacket.Get(NormalizedLandmarkList.Parser);
+                    if(FaceAndIrisLandmarks != null)
                     {
+
+                        if(firstCalled == true)
+                        {
+                            CircleForCalibration.SetActive(true);
+                            firstCalled = false;
+                        }
                         //var topOfHead = FaceandIrisLandmarks.Landmark[10];
                         //Debug.Log($"Unity Local Coordinates: {screenRect.GetPoint(topOfHead)}, Image Coordinates: {topOfHead}");
 
-                        // 안면 기울기 추적 함수
-                        GetComponent<GazeEstimator>().HeadPoseTracker(FaceandIrisLandmarks);
+                        // 머리 방향 추적 함수
+                        //GetComponent<GazeEstimator>().HeadPoseTracker(FaceAndIrisLandmarks);
 
                         //// 랜드마크 점을 구체가 따라다니게 함
                         //GetComponent<GazeEstimator>().FollowSphereToLandmarks(FaceandIrisLandmarks);
 
                         // 눈동자 추적 함수
-                        GetComponent<GazeEstimator>().EyeTracker(FaceandIrisLandmarks);
+                        //GetComponent<GazeEstimator>().EyeTracker(FaceAndIrisLandmarks);
                     }
                 }
 

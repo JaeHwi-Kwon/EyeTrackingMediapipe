@@ -11,6 +11,8 @@ using OpenCvSharp;
 using UnityEngine.UIElements;
 using Unity.VisualScripting;
 using System;
+using UnityEditor.AssetImporters;
+using Mediapipe.Unity.EyeTrackingSystem;
 
 public class GazeEstimator : MonoBehaviour
 {
@@ -19,13 +21,15 @@ public class GazeEstimator : MonoBehaviour
     [SerializeField] private GameObject canvas;
     [SerializeField] private float width;
     [SerializeField] private float height;
+    [SerializeField] private GameObject cursor;
 
     private Vector3 vec;
     
     private Vector3 TemporarycalibratedDirection;
+    private float XWeight, YWeight, XBias, YBias;
+    private bool isCalibreated = false;
 
     private UnityEngine.Rect screenRect;
-    private NormalizedLandmarkList faceNirislandmarks;
     private GameObject[] spheresForLandmarks = new GameObject[468];
 
     private int[] LeftEyeIndices = new int[]{362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398};
@@ -36,30 +40,27 @@ public class GazeEstimator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        screenRect = screen.GetComponent<RectTransform>().rect;
-        for (int i = 0; i < 468; i++)
-        {
-            spheresForLandmarks[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            spheresForLandmarks[i].transform.SetParent(canvas.transform);
-            spheresForLandmarks[i].transform.localScale = new Vector3(5, 5, 5);
-        }
+        //screenRect = screen.GetComponent<RectTransform>().rect;
+        //for (int i = 0; i < 468; i++)
+        //{
+        //    spheresForLandmarks[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //    spheresForLandmarks[i].transform.SetParent(canvas.transform);
+        //    spheresForLandmarks[i].transform.localScale = new Vector3(5, 5, 5);
+        //}
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+
+        if (isCalibreated)
         {
-            TemporarycalibratedDirection = vec;
-        }
-        if (Input.GetKeyDown(KeyCode.LeftControl))
-        {
-            TemporarycalibratedDirection = Vector3.zero;
+            MoveCursorByGaze(XWeight, XBias, YWeight, YBias);
         }
     }
 
-    public void EyeTracker(NormalizedLandmarkList landmarks)
+    public Vector2 EyeTracker(NormalizedLandmarkList landmarks)
     {
         // 눈 landmark 가져오기
         Vector2[] leyepoints = new Vector2[LeftEyeIndices.Length];
@@ -117,7 +118,9 @@ public class GazeEstimator : MonoBehaviour
         ReyePos = new Vector2(ReyePos.x / (reyeRectSize.x/2), ReyePos.y / (reyeRectSize.y/2));
 
 
-        Debug.Log(LeyePos + "\n" + ReyePos);
+        //Debug.Log(LeyePos + "\n" + ReyePos);
+
+        return LeyePos;
     }
 
     private Vector2 GetCenterPoint(Vector2[] points)
@@ -155,7 +158,7 @@ public class GazeEstimator : MonoBehaviour
         return rect;
     }
 
-    public void HeadPoseTracker(NormalizedLandmarkList landmarks)
+    public Vector2 HeadPoseTracker(NormalizedLandmarkList landmarks)
     {
         if(landmarks == null) { Debug.Log("Empty!"); }
 
@@ -212,8 +215,6 @@ public class GazeEstimator : MonoBehaviour
         // 3D 좌표계와 2D 좌표계, 카메라 파라미터, 왜곡 정보를 통해 카메라의 회전, 이동을 계산하는 함수
         Cv2.SolvePnP(object_points, image_points, camera_matrix, dist_coeffs, rvec, tvec);
 
-        Debug.Log(rvec.Dump());
-
         Mat rotMat = new Mat();
 
         // SolvePnP에서 나온 Rodrigues 표현식 rvec를 3x3 행렬로 변환
@@ -237,10 +238,38 @@ public class GazeEstimator : MonoBehaviour
                                                          rotVecForUnity.z - TemporarycalibratedDirection.z);
 
 
-        Debug.Log(rotVecForUnity);
+        //Debug.Log(rotVecForUnity);
         vec = rotVecForUnity;
 
-        
+        // normalize Head Pose
+        Vector2 headPoseDir = new Vector2(rotVecForUnity.y/180, rotVecForUnity.x/180);
+
+        return headPoseDir;
+    }
+
+
+    public void MoveCursorByGaze(float wx, float bx, float wy, float by)
+    {
+        Vector2 hp = HeadPoseTracker(GetComponent<FaceLandmarksParser>().FaceAndIrisLandmarks);
+        Vector2 eye = EyeTracker(GetComponent<FaceLandmarksParser>().FaceAndIrisLandmarks);
+
+        //cursor.transform.localPosition = new Vector3((hp.x + eye.x) * wx + bx, (hp.y + eye.y) * wy + by, 0);
+        //cursor.transform.localPosition = new Vector2(((eye.x) * wx + bx)* UnityEngine.Screen.width, 
+        //                                             ((eye.y) * wy + by)*UnityEngine.Screen.height);
+
+        cursor.transform.localPosition = new Vector2(((hp.x) * wx + bx) * UnityEngine.Screen.width,
+                                                     ((hp.y) * wy + by) * UnityEngine.Screen.height);
+    }
+
+    public void SaveCalibrationResult(float wx, float bx, float wy, float by)
+    {
+        XWeight = wx;
+        YWeight = wy;
+        XBias = bx;
+        YBias = by;
+
+        cursor.SetActive(true);
+        isCalibreated = true;
     }
 
 

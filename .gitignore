@@ -74,4 +74,7 @@ crashlytics-build.properties
 [Aa]ssets[Ss]treamingAssetsaa.meta
 [Aa]ssets[Ss]treamingAssetsaa
 
+# Plugin Directory
+Assets/Plugins/
+
 # End of httpswww.toptal.comdevelopersgitignoreapiunity
