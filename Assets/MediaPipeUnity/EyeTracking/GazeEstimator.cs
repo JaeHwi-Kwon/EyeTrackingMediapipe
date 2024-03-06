@@ -22,11 +22,12 @@ public class GazeEstimator : MonoBehaviour
     [SerializeField] private float width;
     [SerializeField] private float height;
     [SerializeField] private GameObject cursor;
+    [SerializeField] private int BufSizeForSmoothing;
 
     private Vector3 vec;
     
     private Vector3 TemporarycalibratedDirection;
-    private float XWeight, YWeight, XBias, YBias;
+    private float XWeight1, XWeight2, YWeight1, YWeight2, XBias, YBias;
     private bool isCalibreated = false;
 
     private UnityEngine.Rect screenRect;
@@ -37,6 +38,9 @@ public class GazeEstimator : MonoBehaviour
 
     private int[] LeftIrisIndices = new int[] { 474, 475, 476, 477 };
     private int[] RightIrisIndices = new int[] { 469, 470, 471, 472 };
+
+    private Smoothing smoothing;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -48,6 +52,7 @@ public class GazeEstimator : MonoBehaviour
         //    spheresForLandmarks[i].transform.localScale = new Vector3(5, 5, 5);
         //}
 
+        smoothing = new Smoothing(BufSizeForSmoothing);
     }
 
     // Update is called once per frame
@@ -56,7 +61,7 @@ public class GazeEstimator : MonoBehaviour
 
         if (isCalibreated)
         {
-            MoveCursorByGaze(XWeight, XBias, YWeight, YBias);
+            MoveCursorByGaze(XWeight1, XWeight2, XBias, YWeight1, YWeight2, YBias);
         }
     }
 
@@ -248,23 +253,27 @@ public class GazeEstimator : MonoBehaviour
     }
 
 
-    public void MoveCursorByGaze(float wx, float bx, float wy, float by)
+    public void MoveCursorByGaze(float wx1, float wx2, float bx, float wy1, float wy2, float by)
     {
         Vector2 hp = HeadPoseTracker(GetComponent<FaceLandmarksParser>().FaceAndIrisLandmarks);
         Vector2 eye = EyeTracker(GetComponent<FaceLandmarksParser>().FaceAndIrisLandmarks);
 
-        //cursor.transform.localPosition = new Vector3((hp.x + eye.x) * wx + bx, (hp.y + eye.y) * wy + by, 0);
-        //cursor.transform.localPosition = new Vector2(((eye.x) * wx + bx)* UnityEngine.Screen.width, 
-        //                                             ((eye.y) * wy + by)*UnityEngine.Screen.height);
+        Vector2 newPos = new Vector2(((hp.x) * wx1 + (eye.x) * wx2 * 0.3f + bx) * UnityEngine.Screen.width/2,
+                                     (-(hp.y) * wy1 + (eye.y) * wy2 * 0.3f + by) * UnityEngine.Screen.height/2);
 
-        cursor.transform.localPosition = new Vector2(((hp.x) * wx + bx) * UnityEngine.Screen.width,
-                                                     ((hp.y) * wy + by) * UnityEngine.Screen.height);
+        newPos.x = Mathf.Clamp(newPos.x, -width/2, width/2);
+        newPos.y = Mathf.Clamp(newPos.y, -height/2, height/2);
+
+        cursor.transform.localPosition = Vector2.Lerp(cursor.transform.localPosition, smoothing.DoSmoothing(newPos), Time.deltaTime * 20);
     }
 
-    public void SaveCalibrationResult(float wx, float bx, float wy, float by)
+    public void SaveCalibrationResult(float wx1, float wx2, float bx,
+                                      float wy1, float wy2, float by)
     {
-        XWeight = wx;
-        YWeight = wy;
+        XWeight1 = wx1;
+        XWeight2 = wx2;
+        YWeight1 = wy2;
+        YWeight2 = wy2;
         XBias = bx;
         YBias = by;
 
@@ -282,4 +291,30 @@ public class GazeEstimator : MonoBehaviour
         }
     }
 
+
+
+}
+
+public class Smoothing
+{
+    private Vector2[] buffer;
+    private int buffer_index;
+    private Vector2 sum;
+
+    public Smoothing(int num)
+    {
+        buffer = new Vector2[num];
+        buffer_index = 0;
+        sum = Vector2.zero;
+    }
+    public Vector2 DoSmoothing(Vector2 v)
+    {
+        sum -= buffer[buffer_index];
+        buffer[buffer_index] = v;
+        sum += v;
+
+        buffer_index = (buffer_index + 1) % buffer.Length;
+
+        return sum / buffer.Length;
+    }
 }

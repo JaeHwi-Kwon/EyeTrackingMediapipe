@@ -267,6 +267,7 @@ MonoBehaviour:
   width: 640
   height: 480
   cursor: {fileID: 94169882}
+  BufSizeForSmoothing: 20
 --- !u!1 &177700012
 GameObject:
   m_ObjectHideFlags: 0

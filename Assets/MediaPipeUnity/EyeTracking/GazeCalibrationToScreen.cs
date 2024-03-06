@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mediapipe.Unity.EyeTrackingSystem;
+using Tensorflow.Keras.Engine;
 using Tensorflow.NumPy;
 using static Tensorflow.Binding;
-using System.IO;
-using Mediapipe;
-using Mediapipe.Unity.EyeTrackingSystem;
-using System;
+using Tensorflow;
 
 public class GazeCalibrationToScreen : MonoBehaviour
 {
@@ -25,8 +24,7 @@ public class GazeCalibrationToScreen : MonoBehaviour
 
     public int training_epochs = 1000;
 
-    private float learning_rate = 0.01f;
-    private int display_step = 50;
+    private float learning_rate = 0.5f;
 
     private float weight, bias;
 
@@ -53,7 +51,7 @@ public class GazeCalibrationToScreen : MonoBehaviour
         calibration_Done = false;
         // 캘리브레이션에 필요한 임의의 점 9개
         Coordinates = new Vector2[] {   new Vector2(-0.4f,0.4f),
-                                        new Vector2(0,0.3f),
+                                        new Vector2(0,0.4f),
                                         new Vector2(0.4f,0.4f),
                                         new Vector2(-0.4f,0),
                                         new Vector2(0,0),
@@ -90,97 +88,124 @@ public class GazeCalibrationToScreen : MonoBehaviour
         }
     }
 
+    // 선형회귀 학습
     private bool RunLinearRegression()
     {
         tf.compat.v1.disable_eager_execution();
 
         PrepareData(eyeDir, headPose);
 
-        var X_x = tf.placeholder(tf.float32);
-        var Y_x = tf.placeholder(tf.float32);
+        var X1 = tf.placeholder(tf.float32);
+        var X2 = tf.placeholder(tf.float32);
+        var Y = tf.placeholder(tf.float32);
 
-        var W_x = tf.Variable(0.1f, name: "Xweight");
-        var b_x = tf.Variable(0.2f, name: "Xbias");
+        var W1 = tf.Variable(0.0f);
+        var W2 = tf.Variable(0.0f);
+        var b = tf.Variable(0.0f);
 
-        var X_y = tf.placeholder(tf.float32);
-        var Y_y = tf.placeholder(tf.float32);
+        var pred = tf.add(tf.add(tf.multiply(X1, W1), tf.multiply(X2, W2)), b);
+        var cost = tf.reduce_sum(tf.pow(pred - Y, 2.0f)) / (2.0f * n_samples);
 
-        var W_y = tf.Variable(0.1f, name: "Yweight");
-        var b_y = tf.Variable(0.2f, name: "Ybias");
-
-        var pred_x = tf.add(tf.multiply(X_x, W_x), b_x);
-        var pred_y = tf.add(tf.multiply(X_y, W_y), b_y);
-
-        var cost_x = tf.reduce_sum(tf.pow(pred_x - Y_x, 2.0f)) / (2.0f * n_samples);
-        var cost_y = tf.reduce_sum(tf.pow(pred_y - Y_y, 2.0f)) / (2.0f * n_samples);
-
-        var optimizer_x = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost_x);
-        var optimizer_y = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost_y);
+        var optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost);
 
         var init = tf.global_variables_initializer();
 
         using var sess = tf.Session();
+        sess.run(init);
+
+        for(int epoch = 0;epoch < training_epochs; epoch++)
+        {
+
+            for (int i = 0; i < 9; i++)
+            {
+                var x1 = train_X_XAxis[0, i];
+                var x2 = train_X_XAxis[1, i];
+                var y = train_Y_XAxis[i];
+
+                sess.run(optimizer, (X1, x1), (X2, x2), (Y, y));
+            }
+        }
+
+        float XWeight1, XWeight2, XBias;
+        XWeight1 = sess.run(W1).numpy();
+        XWeight2 = sess.run(W2).numpy();
+        XBias = sess.run(b).numpy();
+
+        Debug.Log($"XW1 : {XWeight1}, XW2 : {XWeight2}, xb: {XBias}");
+
+        //===================================================================================================================
 
         sess.run(init);
 
-        // Fit all training data
         for (int epoch = 0; epoch < training_epochs; epoch++)
         {
-            foreach (var (x, y) in zip<float>(train_X_XAxis, train_Y_XAxis))
-                sess.run(optimizer_x, (X_x, x), (Y_x, y));
-            foreach (var (x, y) in zip<float>(train_X_YAxis, train_Y_YAxis))
-                sess.run(optimizer_y, (X_y, x), (Y_y, y));
 
+            for (int i = 0; i < 9; i++)
+            {
+                var x1 = train_X_YAxis[0, i];
+                var x2 = train_X_YAxis[1, i];
+                var y = train_Y_YAxis[i];
+
+                sess.run(optimizer, (X1, x1), (X2, x2), (Y, y));
+            }
         }
 
-        Debug.Log($"[X축] W={sess.run(W_x)} b={sess.run(b_x)}");
-        Debug.Log($"[Y축] W={sess.run(W_y)} b={sess.run(b_y)}");
+        float YWeight1, YWeight2, YBias;
+        YWeight1 = sess.run(W1).numpy();
+        YWeight2 = sess.run(W2).numpy();
+        YBias = sess.run(b).numpy();
 
-        float XWeight, XBias;
-        float YWeight, YBias;
+        Debug.Log($"YW1 : {YWeight1}, YW2 : {YWeight2}, Yb: {YBias}");
 
-        XWeight = sess.run(W_x).numpy();
-        YWeight = sess.run(W_y).numpy(); ;
-        XBias = sess.run(b_x).numpy(); ;
-        YBias = sess.run(b_y).numpy(); ;
+        LandMarkParserObj.GetComponent<GazeEstimator>().SaveCalibrationResult(XWeight1, XWeight2, XBias, YWeight1, YWeight2, YBias);
 
-        Debug.Log($"{XWeight} {YWeight} {XBias} {YBias}");
-
-        LandMarkParserObj.GetComponent<GazeEstimator>().SaveCalibrationResult(XWeight,XBias,YWeight,YBias);
         return true;
     }
 
+    // 학습 데이터셋 준비
     private void PrepareData(Vector2[] eye, Vector2[] head)
     {
-        float[] GazeX = new float[9];
+
+        Debug.Log($"HeadPoseList : {head}");
+        Debug.Log($"EyeDirList : {eye}");
+        float[] HeadPoseX = new float[9];
+        float[] HeadPoseY = new float[9];
+
+        float[] EyeDirX = new float[9];
+        float[] EyeDirY = new float[9];
+
+        float[,] gazeX = new float[2, 9];
+        float[,] gazeY = new float[2, 9];
+
         float[] coordinatesX = new float[9];
-        float[] GazeY = new float[9];
         float[] coordinatesY = new float[9];
         for (int i=0;i<9;i++)
         {
-
+            float[] templist = new float[2];
             coordinatesX[i] = Coordinates[i].x;
             coordinatesY[i] = Coordinates[i].y;
 
-            //GazeX[i] = eye[i].x;
-            //GazeY[i] = eye[i].y;
+            EyeDirX[i] = eye[i].x;
+            EyeDirY[i] = eye[i].y;
 
-            GazeX[i] = head[i].x;
-            GazeY[i] = head[i].y;
+            HeadPoseX[i] = head[i].x;
+            HeadPoseY[i] = head[i].y;
 
-            //GazeX[i] = eye[i].x + head[i].x;
-            //GazeY[i] = eye[i].y + head[i].y;
+            gazeX[0, i] = head[i].x;
+            gazeX[1, i] = eye[i].x;
 
-
-
-
+            gazeY[0, i] = head[i].y;
+            gazeY[1, i] = eye[i].y;
         }
 
+        // X 축으로써의 X 관측값
+        train_X_XAxis = np.array(gazeX);
 
-        train_X_XAxis = np.array(GazeX);
+        // Y 축으로써의 X 관측값
+        train_X_YAxis = np.array(gazeY);
+
+        // X, Y 축으로써의 Y 결과값
         train_Y_XAxis = np.array(coordinatesX);
-
-        train_X_YAxis = np.array(GazeY);
         train_Y_YAxis = np.array(coordinatesY);
 
         n_samples = (int)train_X_XAxis.shape[0];
