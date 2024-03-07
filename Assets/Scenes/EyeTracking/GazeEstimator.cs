@@ -1,17 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 using Mediapipe;
-using Mediapipe.Unity;
-using Mediapipe.Unity.CoordinateSystem;
 using UnityEngine.UI;
-using System.Linq;
 using OpenCvSharp;
-using UnityEngine.UIElements;
-using Unity.VisualScripting;
-using System;
-using UnityEditor.AssetImporters;
 using Mediapipe.Unity.EyeTrackingSystem;
 
 public class GazeEstimator : MonoBehaviour

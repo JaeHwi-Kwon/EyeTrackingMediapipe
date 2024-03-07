@@ -1,12 +1,11 @@
+#if UINITY_EDITOR
+using UnityEditor
+#endif
+using Mediapipe.Unity.Sample;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using Mediapipe.Unity.CoordinateSystem;
-
 using Stopwatch = System.Diagnostics.Stopwatch;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEngine.UIElements;
 
 namespace Mediapipe.Unity.EyeTrackingSystem
 {
@@ -22,7 +21,6 @@ namespace Mediapipe.Unity.EyeTrackingSystem
         private CalculatorGraph _graph;
         private OutputStream<ImageFrame> _outputVideoStream;
         private OutputStream<NormalizedLandmarkList> _FaceandIrisLandmarksStream;
-        private ResourceManager _resourceManager;
 
         public NormalizedLandmarkList FaceAndIrisLandmarks;
 
@@ -57,10 +55,10 @@ namespace Mediapipe.Unity.EyeTrackingSystem
 
             _screen.texture = _outputTexture;
 
-            _resourceManager = new LocalResourceManager();
-            yield return _resourceManager.PrepareAssetAsync("face_detection_short_range.bytes");
-            yield return _resourceManager.PrepareAssetAsync("face_landmark.bytes");
-            yield return _resourceManager.PrepareAssetAsync("iris_landmark.bytes");
+            AssetLoader.Provide(new StreamingAssetsResourceManager());
+            yield return AssetLoader.PrepareAssetAsync("face_detection_short_range.bytes", "face_detection_short_range.bytes", false);
+            yield return AssetLoader.PrepareAssetAsync("face_landmark.bytes", "face_landmark.bytes", false);
+            yield return AssetLoader.PrepareAssetAsync("iris_landmark.bytes", "iris_landmark.bytes", false);
 
             var stopwatch = new Stopwatch();
             

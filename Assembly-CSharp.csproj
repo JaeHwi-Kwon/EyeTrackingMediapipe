@@ -156,7 +156,6 @@
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\highgui\Window.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\PInvoke\features2d\NativeMethods_features2d_BRISK.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\Cv2\Cv2_xfeatures2d.cs" />
-    <Compile Include="Assets\MediaPipeUnity\EyeTracking\FaceLandmarksParser.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\Util\PlatformUtil.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\DLib\ShapePredictor.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\Delegate\CvTrackbarCallback.cs" />
@@ -177,7 +176,6 @@
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\Struct\Vecd.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\Enum\RotateFlags.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\Cv2\Cv2_objdetect.cs" />
-    <Compile Include="Assets\MediaPipeUnity\Tutorial\Official Solution\FaceMesh.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\imgproc\GeneralizedHough.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\Mat\MatOfInt4.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\MatExprRangeIndexer.cs" />
@@ -185,6 +183,7 @@
     <Compile Include="Assets\MediaPipeUnity\Samples\Common\Scripts\GraphRunner.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\Vector\VectorOfVectorVec2i.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\Vector\VectorOfERStat.cs" />
+    <Compile Include="Assets\Scenes\EyeTracking\GazeEstimator.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\imgproc\Enum\MorphShapes.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\Enum\DftFlags.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\OutputArray.cs" />
@@ -303,7 +302,6 @@
     <Compile Include="Assets\MediaPipeUnity\Samples\Scenes\Object Detection\ObjectDetectionConfig.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\features2d\AgastFeatureDetector.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\xfeatures2d\StarDetector.cs" />
-    <Compile Include="Assets\MediaPipeUnity\EyeTracking\GazeEstimator.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\Cv2\Cv2_highgui.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\Enum\AlgorithmParamType.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\PInvoke\face\NativeMethods_face_FaceRecognizer.cs" />
@@ -412,6 +410,7 @@
     <Compile Include="Assets\MediaPipeUnity\Samples\Scenes\Tasks\Hand Landmark Detection\HandLandmarkerRunner.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\ml\ANN_MLP.cs" />
     <Compile Include="Assets\MediaPipeUnity\Samples\Scenes\Tasks\Face Landmark Detection\FaceLandmarkDetectionConfigWindow.cs" />
+    <Compile Include="Assets\Scenes\EyeTracking\FaceLandmarksParser.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\PInvoke\NativeMethods_optflow.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\Struct\Rect2d.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\Struct\RotatedRect.cs" />
@@ -499,6 +498,7 @@
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\flann\IndexParams\CompositeIndexParams.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\imgproc\Enum\TemplateMatchModes.cs" />
     <Compile Include="Assets\OpenCV+Unity\Demo\Document_Scanner\Scripts\PaperScanner.cs" />
+    <Compile Include="Assets\Scenes\EyeTracking\GazeCalibrationToScreen.cs" />
     <Compile Include="Assets\MediaPipeUnity\Samples\Scenes\Tasks\Face Detection\FaceDetectorRunner.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\Enum\DctFlags.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\Util\Utility.cs" />
@@ -525,7 +525,6 @@
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\Vector\VectorOfVec6f.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\core\Struct\Vecb.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\face\BasicFaceRecognizer.cs" />
-    <Compile Include="Assets\MediaPipeUnity\EyeTracking\GazeCalibrationToScreen.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\highgui\Enum\WindowMode.cs" />
     <Compile Include="Assets\OpenCV+Unity\Demo\Marker_Detector\MarkerDetector.cs" />
     <Compile Include="Assets\OpenCV+Unity\Assets\Scripts\OpenCvSharp\modules\bgsegm\BackgroundSubtractorMOG.cs" />
@@ -566,7 +565,7 @@
     <None Include="Assets\OpenCV+Unity\smcs.rsp" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Hand Tracking\hand_tracking_opengles.txt" />
     <None Include="Assets\OpenCV+Unity\gmcs.rsp" />
-    <None Include="Assets\MediaPipeUnity\EyeTracking\EyeTracking_gpu.txt" />
+    <None Include="Assets\Scenes\EyeTracking\EyeTracking_gpu.txt" />
     <None Include="Assets\Tensorflow.Net\System.Numerics.Vectors.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Hair Segmentation\hair_segmentation_gpu.txt" />
     <None Include="Assets\Tensorflow.Net\Razorvine.Pickle.dll" />
@@ -593,6 +592,7 @@
     <None Include="Assets\Tensorflow.Net\Serilog.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Selfie Segmentation\selfie_segmentation_opengles.txt" />
     <None Include="Assets\Tensorflow.Net\System.Runtime.CompilerServices.Unsafe.dll" />
+    <None Include="Assets\Tensorflow.Net\Newtonsoft.Json.dll" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Holistic\holistic_opengles.txt" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Iris Tracking\iris_tracking_cpu.txt" />
     <None Include="Assets\MediaPipeUnity\Samples\Scenes\Holistic\holistic_gpu.txt" />
@@ -976,6 +976,10 @@
     </Reference>
     <Reference Include="OneOf">
       <HintPath>Assets\Tensorflow.Net\OneOf.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Assets\Tensorflow.Net\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{71109EF1-F64A-FB95-458C-4F5E28DFA7DF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -401,6 +402,7 @@
     <Compile Include="Packages\com.github.homuler.mediapipe\Runtime\Scripts\Marshal\StructArray.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Packages\com.github.homuler.mediapipe\Runtime\Plugins\Protobuf\System.Buffers.dll" />
     <None Include="Packages\com.github.homuler.mediapipe\Runtime\Mediapipe.Runtime.asmdef" />
     <None Include="Packages\com.github.homuler.mediapipe\Runtime\Plugins\Protobuf\System.Runtime.CompilerServices.Unsafe.dll" />
@@ -409,6 +411,9 @@
     <None Include="Packages\com.github.homuler.mediapipe\Runtime\Plugins\Protobuf\System.Memory.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.16f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
       <Private>False</Private>
