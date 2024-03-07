@@ -49,7 +49,7 @@ namespace Mediapipe.Unity.Sample
         if (GpuManager.IsInitialized)
         {
 #if UNITY_ANDROID
-          if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3 && _openGlEsConfig != null)
+          if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3 && _openGlEsConfig != null)
           {
             return ConfigType.OpenGLES;
           }
